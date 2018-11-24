@@ -5,6 +5,7 @@ import {CustomerDashboardComponent} from './customer-dashboard/customer-dashboar
 
 const routes: Routes = [
   {path: 'customer/dashboard', component: CustomerDashboardComponent }
+  { path: 'customer', redirectTo: 'customer/dashboard', pathMatch: 'full' }
 ];
 
 @NgModule({
