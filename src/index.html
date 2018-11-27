@@ -7,14 +7,31 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <!-- this is essential for downloading all the google apis before using them anywhere. -->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
   <script>
       function initMap(){
-        console.log("index.html: done loading gmaps");
+        console.log("index.html: done downloading gmaps types");
       }
-    </script>
+  </script>
+    <!-- this is essential for downloading all the google apis before using them anywhere. -->
+
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwqXAdOf3z2WaraTsP3kxZHVlAJF6C-bM&callback=initMap"> </script>
-  
+  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> -->
+  <!-- <script>
+    $(document).ready(function() {
+        if (Cookies.get('icc_customer_login') == null) {
+            window.location.replace("/login");
+        } else {
+            Cookies.set("icc_customer_login", Cookies.get("icc_customer_login")); // Reset
+           $("label[for='user_name_label']").html(Cookies.get("icc_customer_login"));
+        }
+    });
+ 
+    $('#customer_logout_button').click(function () {
+        Cookies.remove("icc_customer_login");
+        window.location.replace("/login");
+    });
+ </script>   -->
 </head>
 <body>
   <app-root></app-root>

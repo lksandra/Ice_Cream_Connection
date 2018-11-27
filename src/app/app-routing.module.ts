@@ -4,7 +4,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {CustomerDashboardComponent} from './customer-dashboard/customer-dashboard.component';
 
 const routes: Routes = [
-  {path: 'customer/dashboard', component: CustomerDashboardComponent }
+  {path: 'customer/dashboard', component: CustomerDashboardComponent },
   { path: 'customer', redirectTo: 'customer/dashboard', pathMatch: 'full' }
 ];
 
