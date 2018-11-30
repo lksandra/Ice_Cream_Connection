@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {} from '@types/googlemaps';
-import { customer } from '../schema';
+import { customer, truck } from '../schema';
 import {BackendServerDataFetchingServiceService} from '../backend-server-data-fetching-service.service';
 
 
@@ -92,6 +92,7 @@ export class CustomerDashboardComponent implements OnInit {
             //create markers for each of those trucks, persist in a hashmap<marker>
             //so that when a marker is clicked for booking it can be searched for.
             if(!this.bookedTruck){
+              //need to remove the previous markers.
               for(let each of data.trucks){
                 console.log('each truck\n', each);
                 let truckMarker = new google.maps.Marker({
