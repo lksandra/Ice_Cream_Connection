@@ -10,6 +10,8 @@ truckHandler.use(bodyparser.urlencoded());
 truckHandler.use(cors());
 var baseUrl = "http://localhost:8080";
 
+//trucks: 6,7,8
+//cust: 9,10,11
 var customersObject = {
     "truck_id": 6,
     "latitude": 43.0391539,
@@ -17,7 +19,7 @@ var customersObject = {
     "success": true,
     "customers": [
         {
-        "user_id_id": 10,
+        "user_id_id": 9,
         "latitude": 43.0482894,
         "longitude": -76.1203977,
         "destination_latitude": null,
@@ -27,7 +29,7 @@ var customersObject = {
         
 
         {
-            "user_id_id": 11,
+            "user_id_id": 10,
             "latitude": 43.043967,
             "longitude": -76.119545,
             "destination_latitude": null,
@@ -35,7 +37,7 @@ var customersObject = {
             
         },
         {
-            "user_id_id": 12,
+            "user_id_id": 11,
             "latitude": 43.040305,
             "longitude": -76.132596,
             "destination_latitude": null,
@@ -46,7 +48,7 @@ var customersObject = {
 }
 
 
-truckHandler.route("/updateCoordinate")
+truckHandler.route("/updateCoordinate/")
 .post((req, res, next)=>{
     console.log("/truck/updateCoordinate" +"  post request rcvd");
     //console.log('req\n', req);
@@ -54,7 +56,7 @@ truckHandler.route("/updateCoordinate")
     res.end(JSON.stringify(req.body));
 });
 
-truckHandler.route("/getCustomers")
+truckHandler.route("/getCustomers/")
 .post((req,res,next)=>{
     console.log("/truck/getCustomers" +"  post request rcvd");
     
@@ -63,7 +65,7 @@ truckHandler.route("/getCustomers")
     res.end(JSON.stringify(customersObject));
 });
 
-truckHandler.route("/sendCustomers")
+truckHandler.route("/sendCustomers/")
 .post((req, res, next)=>{
     console.log('/truck/sendCustomers' + "post request rcvd");
     console.log('req.body:\n', req.body);
