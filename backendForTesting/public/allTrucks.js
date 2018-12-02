@@ -1,0 +1,11 @@
+var express = require('express');
+const customerHandler = express.Router();
+var cors = require('cors');
+const morgan = require('morgan');
+const bodyparser = require('body-parser');
+var app = express();
+app.use(cors());
+customerHandler.use(morgan('dev')); 
+customerHandler.use(bodyparser.urlencoded());
+customerHandler.use(cors());
+var baseUrl = "http://localhost:8080";

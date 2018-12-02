@@ -19,8 +19,8 @@ const truckUpdateCoordinatesUrl = baseUrl+"/truck/updateCoordinate/";
 const customerUpdateCoordinatesUrl = baseUrl+"/customer/updateCoordinate/";
 const newDestinationUrl = baseUrl + "/truck/newDestination/";
 const reachedDestinationUrl = baseUrl+"/truck/reachedDestination/";
-//change it to customers/all before deploying
-const getAllCustomers = baseUrl+"/customer/all/";
+//changed it to customers/all before deploying
+const getAllCustomers = baseUrl+"/customers/all/";
 const getCustomerRequests = baseUrl + "/truck/getCustomerRequests/";
 
 

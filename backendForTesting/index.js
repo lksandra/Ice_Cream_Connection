@@ -14,6 +14,11 @@ var baseUrl = "http://localhost:8080";
 
 var customerServiceHandler = require("./public/customerServer");
 var truckServiceHandler = require('./public/truckServer');
+var allCustomersHandler = require('./public/allCustomers');
+
+
+
+
 var servr = app.listen(port, hostname, () => {
     console.log(`Server running at `, baseUrl);
   });
@@ -28,3 +33,4 @@ var servr = app.listen(port, hostname, () => {
 
 app.use("/customer", customerServiceHandler);
 app.use("/truck", truckServiceHandler);
+app.use("/customers", allCustomersHandler);

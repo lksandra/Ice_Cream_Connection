@@ -48,38 +48,38 @@ var trucksObject = {
     ]
 }
 
-var customersAll = {
-    "success": true,
-    "customers": [
-    {
-    "id": 9,
-    "first_name": "A",
-    "last_name": "B",
-    "email": "a@a.com",
-    "role": "Role.customer",
-    "created_time": null,
-    "served_by_id": null
-    },
-    {
-    "id": 10,
-    "first_name": "C",
-    "last_name": "D",
-    "email": "b@b.com",
-    "role": "Role.customer",
-    "created_time": null,
-    "served_by_id": 6
-    },
-    {
-    "id": 11,
-    "first_name": "E",
-    "last_name": "F",
-    "email": "c@c.com",
-    "role": "Role.customer",
-    "created_time": null,
-    "served_by_id": null
-    }
-    ]
-    };
+// var customersAll = {
+//     "success": true,
+//     "customers": [
+//     {
+//     "id": 9,
+//     "first_name": "A",
+//     "last_name": "B",
+//     "email": "a@a.com",
+//     "role": "Role.customer",
+//     "created_time": null,
+//     "served_by_id": null
+//     },
+//     {
+//     "id": 10,
+//     "first_name": "C",
+//     "last_name": "D",
+//     "email": "b@b.com",
+//     "role": "Role.customer",
+//     "created_time": null,
+//     "served_by_id": 6
+//     },
+//     {
+//     "id": 11,
+//     "first_name": "E",
+//     "last_name": "F",
+//     "email": "c@c.com",
+//     "role": "Role.customer",
+//     "created_time": null,
+//     "served_by_id": null
+//     }
+//     ]
+//     };
 
 customerHandler.route("/updateCoordinate/")
 .post((req, res, next)=>{
@@ -98,12 +98,12 @@ customerHandler.route("/getTrucks/")
     res.end(JSON.stringify(trucksObject));
 });
 
-customerHandler.route("/all/")
-.post((req, res, next)=>{
-    console.log('\ncustomer/all/ post req rcvd');
-    console.log('req.body:\n', req.body);
-    console.log('RESPONSE being sent', JSON.stringify(customersAll));
-    res.end(JSON.stringify(customersAll));
-});
+// customerHandler.route("/all/")
+// .post((req, res, next)=>{
+//     console.log('\ncustomer/all/ post req rcvd');
+//     console.log('req.body:\n', req.body);
+//     console.log('RESPONSE being sent', JSON.stringify(customersAll));
+//     res.end(JSON.stringify(customersAll));
+// });
 
 module.exports = customerHandler;
