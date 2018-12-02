@@ -55,6 +55,7 @@ export class TruckDashboardComponent implements OnInit {
        position : new google.maps.LatLng(35, -76.1228379),
        map: this.mapObjectTruck,
        title: 'My Truck: ' + String(this.truck_Id)
+       
      });
     
 

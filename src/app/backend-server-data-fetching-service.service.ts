@@ -68,7 +68,7 @@ export class BackendServerDataFetchingServiceService {
 
   sendCustomers(customer_ids : Number[], truck_id : Number) : Observable<any>{
     console.log('sendCustomers attempting to send srving customers to the sevrer\n', customer_ids);
-    let temp = [{"truck_id" : truck_id}, {"customers" : [customer_ids]}];
+    let temp = {"truck_id" : truck_id, "customers" : customer_ids};
     console.log("truck_id and customer_ids combined:\n", temp);
     return this.http.post<any>(sendCustomersUrl, temp, httpOptions);
   }
