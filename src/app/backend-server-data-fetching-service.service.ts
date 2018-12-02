@@ -19,6 +19,9 @@ const truckUpdateCoordinatesUrl = baseUrl+"/truck/updateCoordinate/";
 const customerUpdateCoordinatesUrl = baseUrl+"/customer/updateCoordinate/";
 const newDestinationUrl = baseUrl + "/truck/newDestination/";
 const reachedDestinationUrl = baseUrl+"/truck/reachedDestination/";
+//change it to customers/all before deploying
+const getAllCustomers = baseUrl+"/customer/all/";
+const getCustomerRequests = baseUrl + "/truck/getCustomerRequests/";
 
 
 
@@ -68,6 +71,17 @@ export class BackendServerDataFetchingServiceService {
     let temp = [{"truck_id" : truck_id}, {"customers" : [customer_ids]}];
     console.log("truck_id and customer_ids combined:\n", temp);
     return this.http.post<any>(sendCustomersUrl, temp, httpOptions);
+  }
+
+  findIfTheTruckHasAcknowledgedToServeTheCustomer() : Observable<any>{
+    console.log('findIfTheTruckHasAcknowledgedToServeTheCustomer executing');
+    return this.http.post<any>(getAllCustomers, JSON.stringify("no need of data") ,httpOptions);
+  }
+
+  getCustomerBookingRequests(truck_id: Number) : Observable<any>{
+    console.log('getCustomerBookingRequests executing with truck_id: ', truck_id);
+    let tempReq = {"truck_id" : truck_id};
+    return this.http.post<any>(getCustomerRequests, tempReq, httpOptions);
   }
 
 

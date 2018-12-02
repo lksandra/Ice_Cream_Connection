@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import {Router, ActivatedRoute} from '@angular/router'
 import {} from '@types/googlemaps';
 import { customer, truck } from '../schema';
 import {BackendServerDataFetchingServiceService} from '../backend-server-data-fetching-service.service';
@@ -16,6 +17,8 @@ export class TruckDashboardComponent implements OnInit {
   infoWindowObjectTruck : google.maps.InfoWindow = new google.maps.InfoWindow;
   markerObjectTruck : google.maps.Marker;
   truckObject : Promise<truck>;
+  truckObjectResolved : truck= new truck(6,43.0417898, -76.1228379 );
+  truck_Id : Number;
   onMove : boolean = false;
   destination : Promise<{
     destination_latitude: Number,
@@ -25,15 +28,20 @@ export class TruckDashboardComponent implements OnInit {
   destinationInfoWindow: google.maps.InfoWindow;
   listOfCustomerMarkers : google.maps.Marker[] = [];
   refreshInterval : number = 60000; //mill second interval to refresh truck's and customers locations on map.
-  //hashMapOfCUstomerMarkers : Map<google.maps.Marker, Number>;
   currentServingBatchOfCustomers : Map<Number, google.maps.Marker>;
+  
 
-
-  constructor(private backendServer : BackendServerDataFetchingServiceService) {
+  constructor(private backendServer : BackendServerDataFetchingServiceService,
+    private actvdRoute : ActivatedRoute, router : Router
+    ) {
     this.currentServingBatchOfCustomers = new Map<Number, google.maps.Marker>();
    }
 
   ngOnInit() {
+
+    if(this.actvdRoute.snapshot.queryParamMap.has("userId")==true){
+      this.truck_Id = Number(this.actvdRoute.snapshot.queryParamMap.get("userId"));
+    }
     var mapPropObjectTruck = {
       // center: new google.maps.LatLng(43.0417898, -76.1228379),
        center: new google.maps.LatLng(35, -76.1228379),
@@ -123,7 +131,7 @@ export class TruckDashboardComponent implements OnInit {
         this.mapObjectTruck.setCenter(pos);
         this.markerObjectTruck.setPosition(pos);
         //var temptruckObject = new truck(123, pos.lat, pos.lng);
-        resolve(new truck(7, pos.lat, pos.lng));
+        resolve(new truck(this.truck_Id, pos.lat, pos.lng));
         // var truckQueryPromise : Promise<any>;
       })
     }else{
@@ -215,13 +223,17 @@ export class TruckDashboardComponent implements OnInit {
     };
     let temp : Number[] = [];
     this.currentServingBatchOfCustomers.forEach(func);
-    var result = this.backendServer.sendCustomers(temp, 7).toPromise();
+    var result = this.backendServer.sendCustomers(temp, this.truck_Id).toPromise();
     
     
   }
 
   endJourney(){
     
+  }
+
+  getCustomerBookingRequests = ()=>{
+
   }
 
 }

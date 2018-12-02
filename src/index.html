@@ -16,9 +16,10 @@
     <!-- this is essential for downloading all the google apis before using them anywhere. -->
 
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAwqXAdOf3z2WaraTsP3kxZHVlAJF6C-bM&callback=initMap"> </script>
-  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script> -->
-  <!-- <script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <script>
     $(document).ready(function() {
+        console.log('Cookies.get(\'icc_customer_login\'): ', Cookies.get('icc_customer_login'));
         if (Cookies.get('icc_customer_login') == null) {
             window.location.replace("/login");
         } else {
