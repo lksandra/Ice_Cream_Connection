@@ -87,6 +87,7 @@ export class CustomerDashboardComponent implements OnInit {
     console.log('this object in updateCoordinatesToServerAndUpdateMapWithNearByTrucks\n', this);
     this.customerObject = this.updateCustomerCoordinatesWhileIdle();
     this.customerObject.then((custObj)=>{
+      console.log('updateCoordinatesToServerAndUpdateMapWithNearByTrucks: custObj\n', custObj);
       this.customerObjectResolved = custObj;
       var tcus = this.backendServer.updateCoordinatesForCustomer(custObj).toPromise();
       tcus.then(()=>{
@@ -118,14 +119,15 @@ export class CustomerDashboardComponent implements OnInit {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        // this.infoWindowObjectTruck.setPosition(pos);
+        
         this.infoWindowObject.setContent('You are here!');
         this.infoWindowObject.open(this.mapObject, this.markerObject);
         this.mapObject.setCenter(pos);
         this.markerObject.setPosition(pos);
-        //var temptruckObject = new truck(123, pos.lat, pos.lng);
-        resolve(new customer(this.customer_id, pos.lat, pos.lng));
-        // var truckQueryPromise : Promise<any>;
+        var tempCustObject = new customer(this.customer_id, pos.lat, pos.lng);
+        console.log('updatecustomercoordinateswhileidle: temptruckobject\n', tempCustObject);
+        resolve(tempCustObject);
+        
       })
     }else{
       reject(new Error("some error in fecthing the navigator position"));

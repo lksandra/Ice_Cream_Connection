@@ -17,8 +17,8 @@ export class TruckDashboardComponent implements OnInit {
   infoWindowObjectTruck : google.maps.InfoWindow = new google.maps.InfoWindow;
   markerObjectTruck : google.maps.Marker;
   truckObject : Promise<truck>;
-  truckObjectResolved : truck= new truck(6,43.0417898, -76.1228379 );
-  truck_Id : Number;
+  truckObjectResolved : truck;
+  truck_id : Number;
   onMove : boolean = false;
   destination : Promise<{
     destination_latitude: Number,
@@ -41,7 +41,7 @@ export class TruckDashboardComponent implements OnInit {
 
     if(this.actvdRoute.snapshot.queryParamMap.has("userId")==true){
       console.log('userId=', this.actvdRoute.snapshot.queryParamMap.get("userId"));
-      this.truck_Id = Number(this.actvdRoute.snapshot.queryParamMap.get("userId"));
+      this.truck_id = Number(this.actvdRoute.snapshot.queryParamMap.get("userId"));
     }
     var mapPropObjectTruck = {
       // center: new google.maps.LatLng(43.0417898, -76.1228379),
@@ -54,7 +54,7 @@ export class TruckDashboardComponent implements OnInit {
      this.markerObjectTruck = new google.maps.Marker({
        position : new google.maps.LatLng(35, -76.1228379),
        map: this.mapObjectTruck,
-       title: 'My Truck: ' + String(this.truck_Id)
+       title: 'My Truck: ' + String(this.truck_id)
      });
     
 
@@ -94,6 +94,7 @@ export class TruckDashboardComponent implements OnInit {
     console.log('this object in updateCoordinatesToServerAndUpdateMapWithNearByCustomers\n', this);
     this.truckObject = this.updateCoordinatesWhileIdle();
     this.truckObject.then((truckOb)=>{
+      console.log('updateCoordinatesToServerAndUpdateMapWithNearByCustomers: truckOb\n', truckOb);
       var t1 = this.backendServer.updateCoordinatesForTruck(truckOb).toPromise();
       //after successful updation of coordinates to the server.
       t1.then(()=>{
@@ -126,14 +127,15 @@ export class TruckDashboardComponent implements OnInit {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        // this.infoWindowObjectTruck.setPosition(pos);
+        
         this.infoWindowObjectTruck.setContent('You are here!');
         this.infoWindowObjectTruck.open(this.mapObjectTruck, this.markerObjectTruck);
         this.mapObjectTruck.setCenter(pos);
         this.markerObjectTruck.setPosition(pos);
-        //var temptruckObject = new truck(123, pos.lat, pos.lng);
-        resolve(new truck(this.truck_Id, pos.lat, pos.lng));
-        // var truckQueryPromise : Promise<any>;
+        var temptruckObject = new truck(this.truck_id, pos.lat, pos.lng);
+        console.log('updatecoordinateswhileidle: temptruckobject \n', temptruckObject);
+        resolve(temptruckObject);
+        
       })
     }else{
       reject(new Error("some error in fecthing the navigator position"));
@@ -227,7 +229,7 @@ export class TruckDashboardComponent implements OnInit {
     };
     let temp : Number[] = [];
     this.currentServingBatchOfCustomers.forEach(func);
-    var result = this.backendServer.sendCustomers(temp, this.truck_Id).toPromise();
+    var result = this.backendServer.sendCustomers(temp, this.truck_id).toPromise();
     
     
   }
