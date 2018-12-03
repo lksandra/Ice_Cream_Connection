@@ -89,6 +89,7 @@ export class TruckDashboardComponent implements OnInit {
      this.updateAgainNearByCustomers(); 
   };
 
+  
 
   updateCoordinatesToServerAndUpdateMapWithNearByCustomers = ()=>{
     console.log('this object in updateCoordinatesToServerAndUpdateMapWithNearByCustomers\n', this);
@@ -147,6 +148,11 @@ export class TruckDashboardComponent implements OnInit {
   updateTruckMapWithNearByCustomers = (nearByCustomerData : any)=>{
     
       try{
+
+        for(let eachCust of this.listOfCustomerMarkers){
+          if(this.currentServingBatchOfCustomers.get(Number(eachCust.getLabel()))==undefined)
+            eachCust.setMap(null);
+        }
         this.listOfCustomerMarkers=[];
       //evaluate to see if the query was success.
         for(let each of nearByCustomerData.customers){

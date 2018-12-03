@@ -135,10 +135,20 @@ export class CustomerDashboardComponent implements OnInit {
     })
   }
 
+  
 
   updateCustomerMapWithNearByTrucks = (nearByTrucksData : any)=>{
     
     try{
+      for(let eachTruck of this.listOfTruckMarkers){
+        if(this.currentBookedBatchOfTrucks.get(Number(eachTruck.getLabel()))!=undefined){
+            continue;
+          }else if(this.currentAcknowledgedBatchOfTrucks.get(Number(eachTruck.getLabel()))!=undefined){
+            continue;
+          }else{
+            eachTruck.setMap(null);
+          }
+      }
       this.listOfTruckMarkers=[];
     //evaluate to see if the query was success.
       for(let each of nearByTrucksData.trucks){
@@ -354,6 +364,7 @@ export class CustomerDashboardComponent implements OnInit {
               //will just setting here reflect change in the hashmap?
               console.log('tempBookedTruckRealTime is:\n', tempBookedTruckRealTime);
               val.setPosition(new google.maps.LatLng(tempBookedTruckRealTime.latitude, tempBookedTruckRealTime.longitude));
+              val.setMap(this.mapObject);
               mp.set(Number(key), val);
               console.log('done setting the booked truck marker on gmaps');
             }
@@ -369,6 +380,7 @@ export class CustomerDashboardComponent implements OnInit {
               //will just setting here reflect change in the hashmap?
               console.log('tempAckdTruckRealTime is:\n ', tempAckdTruckRealTime);
               val.setPosition(new google.maps.LatLng(tempAckdTruckRealTime.latitude, tempAckdTruckRealTime.longitude));
+              val.setMap(this.mapObject);
               mp.set(Number(key), val);
               console.log('done setting the ackd truck marker on gmaps');
             }
