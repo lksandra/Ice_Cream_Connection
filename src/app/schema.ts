@@ -1,4 +1,21 @@
-
+////////////////////////////////////////////////////////////////////////
+//Package: Schema.TS
+//Author: Lakshmi kanth sandra
+//Version: v2.0
+//Development Environment: Toshiba Satellite Windows
+////////////////////////////////////////////////////////////////////////
+//Required Files:
+//===============
+//----------------------------------------------------------------------
+//Operations:
+//===========
+//this package declares the interfaces of customer and truck to be used 
+//by all the other components.
+//----------------------------------------------------------------------
+//public interface:
+//=================
+//class customer is the interface for customer object.
+//class truck is the interface for the the truck object.
 
 
 export class customer {

@@ -39,7 +39,7 @@ var trucksObject = {
         },
         {
             "user_id_id": 8,
-            "latitude": 43.040305,
+            "latitude": 43.042305,
             "longitude": -76.132596,
             "destination_latitude": null,
             "destination_longitude": null,

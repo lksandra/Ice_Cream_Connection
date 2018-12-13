@@ -1,3 +1,51 @@
+////////////////////////////////////////////////////////////////////////
+//Package: Truck-Dashboard
+//Author: Lakshmi kanth sandra
+//Version: v2.0
+//Development Environment: Toshiba Satellite Windows
+////////////////////////////////////////////////////////////////////////
+//Required Files:
+//===============
+//backend-server-data-fetching-service.service.TS
+//schema.TS
+//----------------------------------------------------------------------
+//Operations:
+//===========
+//This package deals solely with the truck dashboard functionalities:
+//----------------------------------------------------------------------
+//Public interface:
+//=================
+//class TruckDashboardComponent: this class is the primary interface
+//which encapsulates all the data and methods.
+//constructor() : takes backendServer dependency injection service and 
+//ativate route as parameters.
+//refreshInterval : interval time for the polling.
+//ngOnInit() : initializes the google maps and sets the callbacks necessary.
+//updateCoordinatesWhileIdle() : this function expression updates the truck'
+//map with its coordinates in real time. returns truck object.
+//updateTruckMapWithNearByCustomers() : This function expression updates the
+//truck's map with near by customers in real time as obtained from the servr
+//updateCoordinatesToServerAndUpdateMapWithNearByCustomers() :
+//this function expression aggregates the above two functions and is the 
+//primary entry point.
+//updateAgainNearByCustomers(): 
+//this function expression executes the updateCoordinatesToServerAndUpdate-
+//MapWithNearByCustomers function with refreshInterval frequency.
+//mapFindHelper() : helper function to search in currentServingBatch
+//mapFindHelper2() : helper function to search in customerRequests.
+//getCustomerBookingRequests() : this function expression queries for
+//customer requests from the backend server.
+//getCustomerBookingRequestsInRealTime() : does polling for refreshInterval
+//frequency and utlizes getCustomerBookingRequests function.
+//startJourney() : this function is evoked when the truck driver decides to
+//start the journey.
+//sendCustomers() : this function updates the backend server with the custo-
+//mers that are about to be served by this truck.
+//endJourney() : this function expression is evoked when all the customers are
+//served by the truck and generates completed journey event.
+//////////////////////////////////////////////////////////////////////////////
+
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {Router, ActivatedRoute} from '@angular/router'
 import {} from '@types/googlemaps';
@@ -13,28 +61,32 @@ import { nextTick } from 'q';
 export class TruckDashboardComponent implements OnInit {
 
   @ViewChild('gmaptruck') gmapElement: any;
-  mapObjectTruck: google.maps.Map;
+  mapObjectTruck: google.maps.Map; //prime google map for this truck.
   infoWindowObjectTruck : google.maps.InfoWindow = new google.maps.InfoWindow;
   markerObjectTruck : google.maps.Marker;
   truckObject : Promise<truck>;
   truckObjectResolved : truck;
-  truck_id : Number;
+  truck_id : Number; 
   onMove : boolean = false;
   destination : Promise<{
     destination_latitude: Number,
     destination_longitude: Number;
   }>;
-  destinationMarkerObject : google.maps.Marker;
+  destinationMarkerObject : google.maps.Marker; //destination selected by the truck
   destinationInfoWindow: google.maps.InfoWindow;
+  //will have all nearby customers but those already present in currentServingBatch and customerRequests.
   listOfCustomerMarkers : google.maps.Marker[] = [];
   refreshInterval : number = 60000; //mill second interval to refresh truck's and customers locations on map.
+  //Those acknowledged by the truck. wont be able to acknowldge whle moving.
   currentServingBatchOfCustomers : Map<Number, google.maps.Marker>;
-  
+  //customers who requested this particular truck.
+  customerRequests : Map<Number, google.maps.Marker>;
 
   constructor(private backendServer : BackendServerDataFetchingServiceService,
     private actvdRoute : ActivatedRoute, router : Router
     ) {
     this.currentServingBatchOfCustomers = new Map<Number, google.maps.Marker>();
+    this.customerRequests = new Map<Number, google.maps.Marker>();
    }
 
   ngOnInit() {
@@ -44,7 +96,7 @@ export class TruckDashboardComponent implements OnInit {
       this.truck_id = Number(this.actvdRoute.snapshot.queryParamMap.get("userId"));
     }
     var mapPropObjectTruck = {
-      // center: new google.maps.LatLng(43.0417898, -76.1228379),
+      
        center: new google.maps.LatLng(35, -76.1228379),
       
        zoom: 15,
@@ -65,8 +117,14 @@ export class TruckDashboardComponent implements OnInit {
 
      this.mapObjectTruck.addListener('rightclick', (event)=>{
        console.log('rightclick event generated:\n', event);
-       if(this.destinationMarkerObject!=undefined && this.destinationMarkerObject!=null){
+       if(this.destinationMarkerObject!==undefined && this.destinationMarkerObject!==null){
          alert("You have already chosen your destination!");
+        console.log('destinationMarkerObject:\n', this.destinationMarkerObject);
+        console.log('destinationInfowWindow: \n', this.destinationInfoWindow); 
+         return;
+       }else if(this.currentServingBatchOfCustomers.size<=0){
+         alert('No customers acknowledged yet. Acknowledge customer by double clicking');
+         console.log('attempt to choose destination while currentServingBatch empty');
          return;
        }
        if(confirm(`confirm   ${event.latLng} \nas your new destination?`)){
@@ -78,6 +136,11 @@ export class TruckDashboardComponent implements OnInit {
           this.destinationInfoWindow = new google.maps.InfoWindow({
             "content" : "Truck destination"
           });
+
+          this.destinationMarkerObject.addListener('click', ()=>{
+            console.log('click event generated for destinationMarker');
+            this.destinationInfoWindow.open(this.mapObjectTruck, this.destinationMarkerObject);
+          })
           this.destinationInfoWindow.open(this.mapObjectTruck, this.destinationMarkerObject);
 
          this.destination = Promise.resolve({"destination_latitude" : event.latLng.lat, "destination_longitude" : event.latLng.lng});
@@ -87,6 +150,7 @@ export class TruckDashboardComponent implements OnInit {
     
      this.updateCoordinatesToServerAndUpdateMapWithNearByCustomers();
      this.updateAgainNearByCustomers(); 
+     this.getCustomerBookingRequestsInRealTime();
   };
 
   
@@ -101,7 +165,9 @@ export class TruckDashboardComponent implements OnInit {
       t1.then(()=>{
         this.backendServer.getNearByCustomers(<truck>truckOb).toPromise()
         .then((customerData)=>{
+          //after nearby customers have been obtained from server
           console.log('near by customerData returned by the server\n', customerData);
+          //updating the map with nearby customers.
           this.updateTruckMapWithNearByCustomers(customerData);
           
         })
@@ -129,7 +195,7 @@ export class TruckDashboardComponent implements OnInit {
           lng: position.coords.longitude
         };
         
-        this.infoWindowObjectTruck.setContent('You are here!');
+        this.infoWindowObjectTruck.setContent('Your Truck is here!');
         this.infoWindowObjectTruck.open(this.mapObjectTruck, this.markerObjectTruck);
         this.mapObjectTruck.setCenter(pos);
         this.markerObjectTruck.setPosition(pos);
@@ -144,20 +210,26 @@ export class TruckDashboardComponent implements OnInit {
     })
   }
 
-  //give the data of nearBycustomersArray it shall update the map.
+  //given the data of nearBycustomersArray it shall update the map.
+  //makes sure the previous customerRequests and currentServingBatch markers are not recreated.
   updateTruckMapWithNearByCustomers = (nearByCustomerData : any)=>{
     
       try{
 
         for(let eachCust of this.listOfCustomerMarkers){
-          if(this.currentServingBatchOfCustomers.get(Number(eachCust.getLabel()))==undefined)
+          
             eachCust.setMap(null);
         }
         this.listOfCustomerMarkers=[];
-      //evaluate to see if the query was success.
+      
         for(let each of nearByCustomerData.customers){
           if(this.mapFindHelper(each.user_id_id)==true){
             console.log('mapFindHelper returned true for: ', each.user_id_id);
+            console.log(each.user_id_id, ': marker exists already in currentServing');
+            continue;
+          }else if(this.mapFIndHelper2(each.user_id_id)==true){
+            console.log('mapFindHelper2 reurned true for: ', each.user_id_id);
+            console.log(each.user_id_id, ': marker exists already in customerRequests');
             continue;
           }
             
@@ -169,30 +241,7 @@ export class TruckDashboardComponent implements OnInit {
           });
           this.listOfCustomerMarkers.push(customerMarker);
 
-          customerMarker.addListener('dblclick', (event)=>{
-            console.log('dbl click event generated by clicking customer marker\n', event);
-            this.currentServingBatchOfCustomers.set(Number(customerMarker.getLabel()), customerMarker);
-            customerMarkerInfoWindow.open(this.mapObjectTruck,customerMarker);
-          });
           
-          let customerMarkerInfoWindow : google.maps.InfoWindow = new google.maps.InfoWindow({
-            'content' : "customer selected"  
-          });
-          customerMarker.addListener("click", ()=>{
-            console.log('click event generated for customedrMarker: ', customerMarker.getLabel());
-            if(this.mapFindHelper(Number(customerMarker.getLabel()))===true){
-              console.log('click event: mapfindhelper result true');
-              customerMarkerInfoWindow.setContent("Customer Selected");
-              customerMarkerInfoWindow.open(this.mapObjectTruck, customerMarker);
-            }else{
-              console.log('click event: mapfinder result false');
-              customerMarkerInfoWindow.setContent("Not yet Selected");
-              customerMarkerInfoWindow.open(this.mapObjectTruck, customerMarker);
-            }
-          });
-          customerMarkerInfoWindow.addListener('closeclick', (event)=>{
-            console.log('closeclick event of customerMarkerInfoWindow generated:\n', event);
-          })
           
           
         }
@@ -216,15 +265,24 @@ export class TruckDashboardComponent implements OnInit {
     return false;   
   }
 
+  mapFIndHelper2(customer_id : Number) : boolean{
+    let temp = this.customerRequests.get(customer_id);
+    if(temp!==undefined && temp!==null)
+      return true;
+    return false;
+  }
+
+  
+
   startJourney = ()=>{
     if(this.destinationMarkerObject!=undefined && this.destinationMarkerObject!=null){
-      //send serving customers to the server.
-      //update the truck posn in map as well as server in real time till journey done.
-      //think about what all parameters to be re/set.
-      console.log(this.currentServingBatchOfCustomers.size);
+      
+      console.log('currentServingBatch size: ', this.currentServingBatchOfCustomers.size);
+      this.onMove = true;
       this.sendCustomers();
     }else{
       console.log("inside else of startJourney:", this.currentServingBatchOfCustomers.size);
+      alert("Please select the destination before starting the journey");      
     }
   }
 
@@ -240,12 +298,119 @@ export class TruckDashboardComponent implements OnInit {
     
   }
 
-  endJourney(){
-    
+  endJourney = ()=>{
+    if(!this.onMove){
+      alert("There is no Trip currently");
+      return;
+    }
+    console.log('end of journey being notified to the server');
+    this.backendServer.sendReachedDestinationSignalToServer(this.truck_id)
+    .toPromise()
+    .then((data)=>{
+      this.onMove = false;
+      let func = function logMapElements(value, key, map) {
+        value.setMap(null);
+        
+      };
+      
+      this.currentServingBatchOfCustomers.forEach(func);
+      console.log('endJourney: clearing currentServingBatchOfCustomers');
+      this.currentServingBatchOfCustomers.clear();
+      this.destinationMarkerObject.setMap(null);
+      this.destinationMarkerObject = null;
+      this.destination = null;
+    })
   }
 
+  //moves the marker from listofcustomerMarkers to customerRequests when there is 
+  //a request from the customer for this truck. In addition to that a double click event for
+  //customer acknowledgement is registered. 
   getCustomerBookingRequests = ()=>{
+    console.log('getCustomerBookingRequests callback');
+    this.backendServer.getCustomerBookingRequests(this.truck_id).toPromise()
+    .then((custReqs)=>{
+      //after successful obtaining of customer requests from the server
+      console.log('custReqs rcvd: ', custReqs);
+      for(let eachCust of custReqs.customers ){
+        if(!this.mapFIndHelper2(eachCust.user_id_id) && !this.mapFindHelper(eachCust.user_id_id)){
+          let nearByCustMarker = this.listOfCustomerMarkers.find(function(nearByCust : any) : any{
+            return Number(nearByCust.getLabel())==Number(eachCust.user_id_id);
+          });
 
+          if(nearByCustMarker!==undefined){
+            
+            console.log('moving the marker from listOfCustomers to customerRequest: ', nearByCustMarker.getLabel());
+             this.customerRequests.set(Number(nearByCustMarker.getLabel()), nearByCustMarker);
+             this.listOfCustomerMarkers.splice(this.listOfCustomerMarkers.indexOf(nearByCustMarker), 1);
+             let nearByCustomerMarkerInfoWindow : google.maps.InfoWindow = new google.maps.InfoWindow({
+              'content' : "customer Requested"  
+            });
+            nearByCustomerMarkerInfoWindow.open(this.mapObjectTruck,nearByCustMarker);
+          let nearByDblclickEventListnr =  nearByCustMarker.addListener('dblclick', (event)=>{
+              if(this.onMove==true){
+                console.log('cant acknowledge while currently serving');
+                return;
+              }else{
+                console.log('moving marker from customerRequests to currentServing');
+                //fetch the marker from customerRequests.
+                let ackdCustMarker = this.customerRequests.get(Number(nearByCustMarker.getLabel()));
+                
+                let ackdCustMarkerInfoWindow : google.maps.InfoWindow = new google.maps.InfoWindow({
+                  'content' : "customer Acknowledged"  
+                });
+                ackdCustMarkerInfoWindow.open(this.mapObjectTruck, ackdCustMarker);
+                //push the marker into the currentSrvingBatch.
+                this.currentServingBatchOfCustomers.set(Number(ackdCustMarker.getLabel()), ackdCustMarker);
+                //removing the marker from customerRequests
+                this.customerRequests.delete(Number(ackdCustMarker.getLabel()));
+                //remove the double click event listener for ackdCustomer to prevent redundant selctions.
+                ackdCustMarker.addListener('dblclick', (event)=>{
+                  console.log('dblclick event genearted in ackdCustMarker for: ', ackdCustMarker.getLabel());
+                  alert('CUSTOMER: '+ ackdCustMarker.getLabel() + ' already acknowledged');
+                });
+                console.log('removing the dblclick event listener for nearByCustmarker: ', nearByCustMarker.getLabel());
+                //deregister the event listener to prevent second time acknowledgement.
+                google.maps.event.removeListener(nearByDblclickEventListnr);
+                
+              }
+              
+          
+            });
+
+            //eventListener to show the status of customer
+            nearByCustMarker.addListener('click', (event)=>{
+              console.log('click event generated for marker: ', nearByCustMarker.getLabel());
+              let ackdCustMarkerInfoWindow : google.maps.InfoWindow = new google.maps.InfoWindow({
+                'content' : "customer Acknowledged"  
+              });
+              if(this.mapFindHelper(Number(nearByCustMarker.getLabel()))){
+                ackdCustMarkerInfoWindow.open(this.mapObjectTruck, nearByCustMarker);
+              }else if(this.mapFIndHelper2(Number(nearByCustMarker.getLabel()))){
+                ackdCustMarkerInfoWindow.setContent('customer Requested');
+                ackdCustMarkerInfoWindow.open(this.mapObjectTruck, nearByCustMarker);
+              }
+              
+            })
+            continue;
+            
+          }else{
+            console.log('getCustBookingRequest: this marker not present in any three stores: ', eachCust.user_id_id);
+          }
+
+
+          
+
+
+
+        }else{
+          console.log('getCustomerBookingReq: this cust already present in custReq or currentServ: ', eachCust.user_id_id);
+        }
+      }
+    })
+  }
+
+  getCustomerBookingRequestsInRealTime = ()=>{
+    setInterval(this.getCustomerBookingRequests, this.refreshInterval);
   }
 
 }

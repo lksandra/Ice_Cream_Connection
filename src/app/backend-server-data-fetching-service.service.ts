@@ -1,3 +1,41 @@
+////////////////////////////////////////////////////////////////////////
+//Package: backend-server-data-fetching-service
+//Author: Lakshmi kanth sandra
+//Version: v2.0
+//Development Environment: Toshiba Satellite Windows
+////////////////////////////////////////////////////////////////////////
+//Required Files:
+//===============
+//schema.TS
+//----------------------------------------------------------------------
+//Operations:
+//===========
+//This package is the interface between the backend server and the frontend.
+//it acts as a dependency injection to all the components in the frontend.
+//-----------------------------------------------------------------------
+//Public Interface:
+//=================
+//class BackendServerDataFetchingServiceService: primary class which is the
+//interface for dependencies.
+//updateCoordinatesForTruck() : updates the truck's coordinates to backend
+//updateCoordinatesForCustomer() : updates the customer's coordinates to 
+//backend.
+//getNearByTrucks() : queries nearby trucks for a given customer.
+//bookTruckById() : customer books for this truck_id
+//getNearByCustomers() : queries the backend for near by customers.
+//sendCustomers() : for a given truck sends currently serving customers 
+//to the backend.
+//findIfTheTruckHasAcknowledgedToServeTheCustomer() : queries the backend
+//for ascertaining the acknowledgement from the truck.
+//getCustomerBookingRequests() : queries the backend for customer requests
+//for a given truck.
+//sendReachedDestinationSignalToServer() : signals the backend server about
+//the reached status.
+//sendNewDestinationToServer() : sends to the backend the new destination 
+//as chosen by the truck.
+
+
+
 import { Injectable } from '@angular/core';
 import { HttpClient , HttpHeaders} from '@angular/common/http';
 import { of } from 'rxjs/observable/of';
@@ -19,7 +57,6 @@ const truckUpdateCoordinatesUrl = baseUrl+"/truck/updateCoordinate/";
 const customerUpdateCoordinatesUrl = baseUrl+"/customer/updateCoordinate/";
 const newDestinationUrl = baseUrl + "/truck/newDestination/";
 const reachedDestinationUrl = baseUrl+"/truck/reachedDestination/";
-//changed it to customers/all before deploying
 const getAllCustomers = baseUrl+"/customers/all/";
 const getCustomerRequests = baseUrl + "/truck/getCustomerRequests/";
 
@@ -82,6 +119,17 @@ export class BackendServerDataFetchingServiceService {
     console.log('getCustomerBookingRequests executing with truck_id: ', truck_id);
     let tempReq = {"truck_id" : truck_id};
     return this.http.post<any>(getCustomerRequests, tempReq, httpOptions);
+  }
+
+  sendReachedDestinationSignalToServer(truck_id: Number) : Observable<any>{
+    console.log('sendReachedDestinationSignalToServer executing with truck_id: ', truck_id);
+    let tempReq = {"truck_id" : truck_id};
+    return this.http.post<any>(reachedDestinationUrl, tempReq, httpOptions); 
+  }
+
+  sendNewDestinationToServer(destinationObj : any) : Observable<any>{
+    console.log('sendNewDestinationToServer executing with destinationObj: ', destinationObj);
+    return this.http.post<any>(newDestinationUrl, destinationObj, httpOptions); 
   }
 
 

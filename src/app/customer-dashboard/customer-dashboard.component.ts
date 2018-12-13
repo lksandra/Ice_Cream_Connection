@@ -1,3 +1,46 @@
+////////////////////////////////////////////////////////////////////////
+//Package: customer-dashboard
+//Author: Lakshmi kanth sandra
+//Version: v2.0
+//Development Environment: Toshiba Satellite Windows
+////////////////////////////////////////////////////////////////////////
+//Required Files:
+//===============
+//backend-server-data-fetching-service.service.TS
+//schema.TS
+//----------------------------------------------------------------------
+//Operations:
+//===========
+//This package exclusively deals with the customer-dashboard component.
+//Public-Interface:
+//=================
+//class CustomerDashboardComponent: primary class which encapsualtes all
+//the data and methods for this component.
+//listOfTruckMarkers: container for the nearby trucks.
+//currentBookedBatchOfTrucks: container for the trucks in which the
+//customer is interested.
+//currentAcknowledgedBatchOfTrucks: container for the trucks that acknowledged
+//serve this customer.
+//refreshInterval: time interval for polling the backend server.
+//ngOnInit() : initializes the google maps and sets the callbacks necessary.
+//updateCoordinatesWhileIdle() : this function expression updates the customer'
+//map with its coordinates in real time. returns customer object.
+//updateCustomerMapWithNearByTrucks() : updates the map with nearby trucks
+//for this customer.
+//updateCoordinatesToServerAndUpdateMapWithNearByTrucks() : composes 
+//updateCoordinatesWhileIdle and updateCustomerMapWithNearByTrucks function 
+//expressions.
+//updateAgainNearByTrucks() : executes updateCoordinatesToServerAndUpdateMap-
+//WithNearByTrucks function expression with refreshInterval frequency.
+//pollForBookedTruckAck() : this function expression polls for
+//real time acknowledgement of truck with respect to this customer.
+//keepPollingForTruckAcknowledgement() : executes the pollForBookedTruckAck
+//in refreshInterval frequency.
+//updateBookedAndAcknowledgedTrucksPosition() : updates the customer'
+//google map with booked and acknowledged positions in real time.
+
+
+
 import { Component, OnInit, ViewChild } from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {} from '@types/googlemaps';
@@ -20,7 +63,7 @@ export class CustomerDashboardComponent implements OnInit {
   customer_id : Number;
   bookedTruck : boolean = false;
   bookedTruckId : Number;
-  //hashMapOfTruckMarkers : Map<google.maps.Marker, Number>;
+  
   listOfTruckMarkers : google.maps.Marker[] = [];
   currentBookedBatchOfTrucks : Map<Number, google.maps.Marker>;
   currentBookedBatchOfTruckInfoWindows : Map<Number, google.maps.InfoWindow>;
@@ -42,7 +85,7 @@ export class CustomerDashboardComponent implements OnInit {
       this.customer_id = Number(this.activdRoute.snapshot.queryParamMap.get("userId"));
     }
     var mapPropObject = {
-     // center: new google.maps.LatLng(43.0417898, -76.1228379),
+     
      center: new google.maps.LatLng(35, -76.1228379),
       zoom: 15,
       mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -54,17 +97,10 @@ export class CustomerDashboardComponent implements OnInit {
       title: 'CUSTOMER: '+ String(this.customer_id)
     });
     
-    // this.markerObject.addListener('click', (data)=>{
-    //   console.log('marker click event generated with data\n', data.latLng.lat());
-    //   //here ask the customer if he wants to book with that truck and then 
-    //   //1.set the bookedtruck to true to prevent any further getNearByTrucks polling.
-    //   //2.send the server that this truck is being booked by the customer.
-    //   //3.next constantly poll to see if that truck has acknowledged.
-    //   this.bookedTruck = true;
-    // });
+    
     console.log(this);
-    //this function continuously updates the browser location.
-    //this.updateCoordinates();
+    
+    
     this.updateCoordinatesToServerAndUpdateMapWithNearByTrucks();
     this.updateAgainNearByTrucks();
     this.updateBookedAndAcknowledgedTrucksPositionInRealTimeContinuously();
@@ -91,6 +127,7 @@ export class CustomerDashboardComponent implements OnInit {
       this.customerObjectResolved = custObj;
       var tcus = this.backendServer.updateCoordinatesForCustomer(custObj).toPromise();
       tcus.then(()=>{
+        //after successfully obtaining of the near by trucks from the server.
         this.backendServer.getNearByTrucks(custObj).toPromise()
         .then((truckData)=>{
           console.log('near by trucks data returned by the server\n', truckData);
@@ -137,6 +174,8 @@ export class CustomerDashboardComponent implements OnInit {
 
   
 
+  //updats the cusomer map with near by trucks and make sure there is no redundant
+  //marers being created.
   updateCustomerMapWithNearByTrucks = (nearByTrucksData : any)=>{
     
     try{
@@ -150,7 +189,7 @@ export class CustomerDashboardComponent implements OnInit {
           }
       }
       this.listOfTruckMarkers=[];
-    //evaluate to see if the query was success.
+    
       for(let each of nearByTrucksData.trucks){
         if(this.mapFindHelper(Number(each.user_id_id))==true){
           console.log('mapFinder returned true for: ', each.user_id_id);
@@ -164,6 +203,7 @@ export class CustomerDashboardComponent implements OnInit {
         });
         this.listOfTruckMarkers.push(truckMarker);
         
+        //event handler that enables the customer to book for a truck by double click
         truckMarker.addListener('dblclick', (event)=>{
           console.log('dbl click event generated by clicking truck marker\n', event);
           this.currentBookedBatchOfTrucks.set(Number(truckMarker.getLabel()), truckMarker);
@@ -175,6 +215,7 @@ export class CustomerDashboardComponent implements OnInit {
         let truckMarkerInfoWindow : google.maps.InfoWindow = new google.maps.InfoWindow({
           'content' : "Truck selected"  
         });
+        //event handler to ascertain the status of a given truck
         truckMarker.addListener("click", ()=>{
           console.log('click event generated for truckMarker: ', truckMarker.getLabel());
           if(this.mapFindHelper2(Number(truckMarker.getLabel()))==true){
@@ -208,6 +249,7 @@ export class CustomerDashboardComponent implements OnInit {
     setInterval(this.updateCoordinatesToServerAndUpdateMapWithNearByTrucks, this.refreshInterval);
   }
 
+  //helper to query Maps.
   mapFindHelper(truck_id : Number ) : boolean{
     console.log('mapFindHelper executing with value of this as:\n', this);
     console.log('mapFindHelper rcvd truck_id: ', truck_id);
@@ -259,6 +301,8 @@ export class CustomerDashboardComponent implements OnInit {
 
 
 
+  //constantly polls for booked and acknowledged truck's position and updates
+  //the customer map with them in real time.
   pollForBookedTruckAck = ()=>{
     console.log('pollForBookedTruckAck executing');
     this.backendServer.findIfTheTruckHasAcknowledgedToServeTheCustomer().toPromise<any>()
@@ -303,41 +347,7 @@ export class CustomerDashboardComponent implements OnInit {
 
 
 
-  // pollForBookedTruckAcknowledgement = ()=>{
-  //   console.log('this.pollForBookedTruckAcknowledgement executing with value of this as:\n', this);
-  //   this.currentBookedBatchOfTrucks.forEach((val , ky , store)=>{
-  //     console.log('callback inside pollForBookedTruckAcknowdgmtn executing');
-  //     console.log('ky: ', ky);
-  //     console.log('val: ', val);
-  //     this.backendServer.findIfTheTruckHasAcknowledgedToServeTheCustomer().toPromise()
-  //     .then((allCustomers)=>{
-  //       console.log('===========================allCustomers:\n', allCustomers);
-  //       if(allCustomers.success==true){
-  //         console.log('pollforbookdtruck: allCustomers.success: ', allCustomers.success);
-  //         for(let eachCus of allCustomers.customers){
-  //           if(eachCus.served_by_id==ky){
-  //             this.currentBookedBatchOfTruckInfoWindows.get(Number(ky)).setContent("Truck Will Deliver Soon!");
-  //             let tempTruckInfoWindow = this.currentBookedBatchOfTruckInfoWindows.get(Number(ky));
-  //             let tempTruckMarker = this.currentBookedBatchOfTrucks.get(Number(ky));
-  //             console.log('moving infowindwo from booked to ackd\n', this.currentBookedBatchOfTruckInfoWindows.set(Number(ky), tempTruckInfoWindow));
-  //             console.log('moving marker from booked to ackd\n', this.currentAcknowledgedBatchOfTrucks.set(Number(ky), tempTruckMarker));
-  //             console.log('removing marker '+ ky +'from booked');
-  //             console.log(this.currentBookedBatchOfTrucks.delete(Number(ky)));
-  //             console.log('removing infowindow from booked\n', this.currentBookedBatchOfTruckInfoWindows.delete(Number(ky)) );
-              
-  //             return;
-  //           }else{
-  //             console.log('pollforbookdtruck: eachcus.served_by_id didnt match key');
-  //             console.log('pollforbookdtruck: eachCus.served_by_id: ', eachCus.served_by_id);
-  //           }
-  //         }
-  //       }
-  //     })
-  //     .catch((err)=>{
-  //       console.log('some error while fetching all customers for truck ack finding\n', err);
-  //     })
-  //   })
-  // }
+  
 
   keepPollingForTruckAcknowledgement = ()=>{
     setInterval(this.pollForBookedTruckAck, this.refreshInterval);

@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const bodyparser = require('body-parser');
 var app = express();
 app.use(cors());
+app.use(bodyparser.json());
 
 var hostname = '127.0.0.1';
 var port = 8080;
