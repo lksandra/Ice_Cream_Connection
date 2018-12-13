@@ -59,7 +59,7 @@ const newDestinationUrl = baseUrl + "/truck/newDestination/";
 const reachedDestinationUrl = baseUrl+"/truck/reachedDestination/";
 const getAllCustomers = baseUrl+"/customers/all/";
 const getCustomerRequests = baseUrl + "/truck/getCustomerRequests/";
-
+const logoutUrl = baseUrl + "/login/";
 
 
 
@@ -130,6 +130,10 @@ export class BackendServerDataFetchingServiceService {
   sendNewDestinationToServer(destinationObj : any) : Observable<any>{
     console.log('sendNewDestinationToServer executing with destinationObj: ', destinationObj);
     return this.http.post<any>(newDestinationUrl, destinationObj, httpOptions); 
+  }
+
+  logOutUser(user : any){
+    document.location.replace(logoutUrl);
   }
 
 

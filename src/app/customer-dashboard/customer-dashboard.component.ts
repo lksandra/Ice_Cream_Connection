@@ -54,6 +54,8 @@ import {BackendServerDataFetchingServiceService} from '../backend-server-data-fe
   styleUrls: ['./customer-dashboard.component.css']
 })
 export class CustomerDashboardComponent implements OnInit {
+
+  
   @ViewChild('gmapcustomer') gmapElem: any;
   mapObject: google.maps.Map;
   infoWindowObject : google.maps.InfoWindow = new google.maps.InfoWindow;
@@ -404,6 +406,14 @@ export class CustomerDashboardComponent implements OnInit {
         console.log('some error fetching near by trucks while updating bookd ackd positions\n', err);
       })
     }
+  }
+  
+
+
+  onLogout(){
+    console.log('customer: redirecting the user to the backend server for logging out');
+    
+    this.backendServer.logOutUser(null);
   }
   
 }

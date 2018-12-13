@@ -22,6 +22,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http'
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './/app-routing.module';
+
 import { CustomerDashboardComponent } from './customer-dashboard/customer-dashboard.component';
 import { TruckDashboardComponent } from './truck-dashboard/truck-dashboard.component';
 import {BackendServerDataFetchingServiceService} from './backend-server-data-fetching-service.service'
@@ -41,4 +42,7 @@ import {BackendServerDataFetchingServiceService} from './backend-server-data-fet
   providers: [BackendServerDataFetchingServiceService],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+  
+
+}

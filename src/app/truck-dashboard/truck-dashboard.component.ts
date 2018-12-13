@@ -413,4 +413,10 @@ export class TruckDashboardComponent implements OnInit {
     setInterval(this.getCustomerBookingRequests, this.refreshInterval);
   }
 
+  onLogout(){
+    console.log('Truck: redirecting the user to the backend server for logging out');
+    
+    this.backendServer.logOutUser(null);
+  }
+
 }
